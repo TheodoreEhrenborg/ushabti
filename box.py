@@ -80,14 +80,6 @@ def create_container(allowed_dirs):
         "docker", "run",
         "-d",  # Detached
         "--name", CONTAINER_NAME,
-        "--network", "none",  # No network access for security
-        "--security-opt", "no-new-privileges",  # Prevent privilege escalation
-        "--cap-drop", "ALL",  # Drop all capabilities
-        "--cap-add", "CHOWN",  # Add back minimal necessary capabilities
-        "--cap-add", "DAC_OVERRIDE",
-        "--cap-add", "FOWNER",
-        "--cap-add", "SETGID",
-        "--cap-add", "SETUID",
         *volume_args,
         IMAGE_NAME,
         "sleep", "infinity"  # Keep container running
