@@ -105,16 +105,22 @@ def start_container():
 
 
 def verify_container_config(allowed_dirs):
-    """Verify that container mounts match the current config."""
+    """Verify that container mounts match the current config. Returns True if valid."""
     current_mounts = get_container_mounts()
     expected_mounts = {d: d for d in allowed_dirs}
 
     if current_mounts != expected_mounts:
-        print("Error: Container mounts don't match current config.", file=sys.stderr)
-        print(f"Expected: {expected_mounts}", file=sys.stderr)
-        print(f"Current: {current_mounts}", file=sys.stderr)
-        print(f"Delete the container to recreate: docker rm -f {CONTAINER_NAME}", file=sys.stderr)
-        sys.exit(1)
+        print("Container mounts don't match current config.")
+        print(f"Expected: {expected_mounts}")
+        print(f"Current: {current_mounts}")
+        print(f"Recreating container...")
+        try:
+            subprocess.run(["docker", "rm", "-f", CONTAINER_NAME], check=True, capture_output=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error removing container: {e.stderr.decode()}", file=sys.stderr)
+            sys.exit(1)
+        return False
+    return True
 
 
 def run_command_in_container(command_args, allowed_dirs):
@@ -177,12 +183,18 @@ def main():
         create_container(allowed_dirs)
     elif status == "exited":
         # Container exists but is stopped - verify config and start
-        verify_container_config(allowed_dirs)
-        start_container()
+        if verify_container_config(allowed_dirs):
+            start_container()
+        else:
+            # Config didn't match, container was deleted - recreate
+            create_container(allowed_dirs)
     elif status == "running":
         # Container is running - verify config
-        verify_container_config(allowed_dirs)
-        print(f"Using existing container '{CONTAINER_NAME}'")
+        if verify_container_config(allowed_dirs):
+            print(f"Using existing container '{CONTAINER_NAME}'")
+        else:
+            # Config didn't match, container was deleted - recreate
+            create_container(allowed_dirs)
     else:
         print(f"Error: Container in unexpected state: {status}", file=sys.stderr)
         sys.exit(1)
