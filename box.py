@@ -117,14 +117,33 @@ def verify_container_config(allowed_dirs):
         sys.exit(1)
 
 
-def run_command_in_container(command_args):
+def run_command_in_container(command_args, allowed_dirs):
     """Execute command in the container."""
     if not command_args:
         print("Error: No command specified", file=sys.stderr)
         sys.exit(1)
 
-    # Use docker exec with the command args directly (no shell interpretation)
-    cmd = ["docker", "exec", "-i", CONTAINER_NAME] + command_args
+    # Check if current directory is inside an allowed directory
+    cwd = Path.cwd().resolve()
+    workdir = None
+    for allowed_dir in allowed_dirs:
+        allowed_path = Path(allowed_dir).resolve()
+        try:
+            # Check if cwd is inside or equal to allowed_dir
+            cwd.relative_to(allowed_path)
+            workdir = str(cwd)
+            break
+        except ValueError:
+            # cwd is not inside this allowed_dir
+            continue
+
+    # Build docker exec command
+    cmd = ["docker", "exec", "-i"]
+    if workdir:
+        cmd.extend(["-w", workdir])
+        print(f"Working directory: {workdir}")
+    cmd.append(CONTAINER_NAME)
+    cmd.extend(command_args)
 
     try:
         result = subprocess.run(cmd, check=False)
@@ -171,7 +190,7 @@ def main():
     # Run the command
     command_args = sys.argv[1:]
     print(f"Running: {' '.join(command_args)}")
-    run_command_in_container(command_args)
+    run_command_in_container(command_args, allowed_dirs)
 
 
 if __name__ == "__main__":
