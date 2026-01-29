@@ -3,6 +3,7 @@
 Secure Docker sandbox runner.
 Runs commands in an Ubuntu container with pre-configured volume mounts only.
 """
+
 import subprocess
 import sys
 import json
@@ -42,7 +43,7 @@ def get_container_status():
             ["docker", "inspect", "--format={{.State.Status}}", CONTAINER_NAME],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
         if result.returncode == 0:
             return result.stdout.strip()  # running, exited, etc.
@@ -59,10 +60,12 @@ def get_container_mounts():
             ["docker", "inspect", "--format={{json .Mounts}}", CONTAINER_NAME],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
         mounts = json.loads(result.stdout)
-        return {m["Source"]: m["Destination"] for m in mounts if m.get("Type") == "bind"}
+        return {
+            m["Source"]: m["Destination"] for m in mounts if m.get("Type") == "bind"
+        }
     except Exception:
         return {}
 
@@ -77,12 +80,15 @@ def create_container(allowed_dirs):
         volume_args.extend(["-v", f"{dir_path}:{dir_path}:rw"])
 
     cmd = [
-        "docker", "run",
+        "docker",
+        "run",
         "-d",  # Detached
-        "--name", CONTAINER_NAME,
+        "--name",
+        CONTAINER_NAME,
         *volume_args,
         IMAGE_NAME,
-        "sleep", "infinity"  # Keep container running
+        "sleep",
+        "infinity",  # Keep container running
     ]
 
     try:
@@ -97,7 +103,9 @@ def start_container():
     """Start an existing stopped container."""
     print(f"Starting container '{CONTAINER_NAME}'...")
     try:
-        subprocess.run(["docker", "start", CONTAINER_NAME], check=True, capture_output=True)
+        subprocess.run(
+            ["docker", "start", CONTAINER_NAME], check=True, capture_output=True
+        )
         print(f"Container '{CONTAINER_NAME}' started.")
     except subprocess.CalledProcessError as e:
         print(f"Error starting container: {e.stderr.decode()}", file=sys.stderr)
@@ -115,7 +123,9 @@ def verify_container_config(allowed_dirs):
         print(f"Current: {current_mounts}")
         print(f"Recreating container...")
         try:
-            subprocess.run(["docker", "rm", "-f", CONTAINER_NAME], check=True, capture_output=True)
+            subprocess.run(
+                ["docker", "rm", "-f", CONTAINER_NAME], check=True, capture_output=True
+            )
         except subprocess.CalledProcessError as e:
             print(f"Error removing container: {e.stderr.decode()}", file=sys.stderr)
             sys.exit(1)
