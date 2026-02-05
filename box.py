@@ -7,7 +7,6 @@ Runs commands in an Ubuntu container with pre-configured volume mounts only.
 import subprocess
 import sys
 import json
-import shlex
 import hashlib
 import yaml
 from pathlib import Path
@@ -168,7 +167,7 @@ def run_command_in_container(container_name, command_args, workdir=None):
     if workdir:
         cmd.extend(["-w", workdir])
         print(f"Working directory: {workdir}")
-    cmd.extend([container_name, "bash", "-c", shlex.join(command_args)])
+    cmd.extend([container_name, "bash", "-c", " ".join(command_args)])
 
     try:
         result = subprocess.run(cmd, check=False)
