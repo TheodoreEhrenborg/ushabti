@@ -219,8 +219,8 @@ def main():
     image = matched_entry["image"]
     container_name = get_container_name(dir_path)
 
-    # Handle special "kill" command to remove container
-    if sys.argv[1] == "kill":
+    # Handle special "kill" command to remove container (only if it's the sole argument)
+    if len(sys.argv) == 2 and sys.argv[1] == "kill":
         print(f"Killing container '{container_name}' for directory: {dir_path}")
         status = get_container_status(container_name)
         if status is not None:
