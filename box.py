@@ -219,6 +219,23 @@ def main():
     image = matched_entry["image"]
     container_name = get_container_name(dir_path)
 
+    # Handle special "kill" command to remove container
+    if sys.argv[1] == "kill":
+        print(f"Killing container '{container_name}' for directory: {dir_path}")
+        status = get_container_status(container_name)
+        if status is not None:
+            try:
+                subprocess.run(
+                    ["docker", "rm", "-f", container_name], check=True, capture_output=True
+                )
+                print(f"Container '{container_name}' removed.")
+            except subprocess.CalledProcessError as e:
+                print(f"Error removing container: {e.stderr.decode()}", file=sys.stderr)
+                sys.exit(1)
+        else:
+            print(f"Container '{container_name}' does not exist.")
+        sys.exit(0)
+
     print(f"Using directory: {dir_path}")
     print(f"Using image: {image}")
     print(f"Container: {container_name}")
