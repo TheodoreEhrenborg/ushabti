@@ -7,6 +7,7 @@ Runs commands in an Ubuntu container with pre-configured volume mounts only.
 import subprocess
 import sys
 import json
+import shlex
 from pathlib import Path
 
 
@@ -155,12 +156,12 @@ def run_command_in_container(command_args, allowed_dirs):
 
     # Build docker exec command
     # Use -it to allocate pseudo-TTY so Ctrl+C kills the process inside container
+    # Wrap command in bash -c to support pipes, redirects, etc.
     cmd = ["docker", "exec", "-it"]
     if workdir:
         cmd.extend(["-w", workdir])
         print(f"Working directory: {workdir}")
-    cmd.append(CONTAINER_NAME)
-    cmd.extend(command_args)
+    cmd.extend([CONTAINER_NAME, "bash", "-c", shlex.join(command_args)])
 
     try:
         result = subprocess.run(cmd, check=False)
