@@ -161,9 +161,14 @@ def run_command_in_container(container_name, command_args, workdir=None):
         sys.exit(1)
 
     # Build docker exec command
-    # Use -it to allocate pseudo-TTY so Ctrl+C kills the process inside container
+    # Use -t only if we have a TTY (for Ctrl+C support)
+    # Otherwise just use -i (keeps stdin open but no TTY)
     # Wrap command in bash -c to support pipes, redirects, etc.
-    cmd = ["docker", "exec", "-it"]
+    if sys.stdin.isatty():
+        cmd = ["docker", "exec", "-it"]
+    else:
+        cmd = ["docker", "exec", "-i"]
+
     if workdir:
         cmd.extend(["-w", workdir])
         print(f"Working directory: {workdir}")
