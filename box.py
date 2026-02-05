@@ -154,7 +154,8 @@ def run_command_in_container(command_args, allowed_dirs):
             continue
 
     # Build docker exec command
-    cmd = ["docker", "exec", "-i"]
+    # Use -it to allocate pseudo-TTY so Ctrl+C kills the process inside container
+    cmd = ["docker", "exec", "-it"]
     if workdir:
         cmd.extend(["-w", workdir])
         print(f"Working directory: {workdir}")
