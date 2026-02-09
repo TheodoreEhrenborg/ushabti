@@ -22,6 +22,10 @@ A simple sandbox so you can give Claude free range, but only over one folder
   image: ubuntu:latest
 ```
 
+## Security
+
+Is this really secure if Claude were determined to cause damage? Probably not. e.g. Claude could put malicious code in your project and wait for you to run the code outside the sandbox
+
 ## Etymology
 
 From [wiktionary](https://en.wiktionary.org/wiki/ushabti):
