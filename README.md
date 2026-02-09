@@ -22,6 +22,8 @@ A simple sandbox so you can give Claude free range, but only over one folder
   image: ubuntu:latest
 ```
 
+6. Start `claude` in `~/my-project`. It saves Claude time if the Docker image contains necessary dependencies, but Claude is also pretty good at installing what it needs when dropped into vanilla Ubuntu
+
 ## Security
 
 Is this really secure if Claude were determined to cause damage? Probably not. e.g. Claude could put malicious code in your project and wait for you to run the code outside the sandbox
