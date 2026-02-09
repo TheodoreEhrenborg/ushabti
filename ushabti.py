@@ -12,7 +12,7 @@ import yaml
 from pathlib import Path
 
 
-CONFIG_DIR = Path.home() / ".config" / "box"
+CONFIG_DIR = Path.home() / ".config" / "ushabti"
 CONFIG_FILE = CONFIG_DIR / "config.yaml"
 
 
@@ -54,7 +54,7 @@ def get_container_name(dir_path):
     """Generate a unique container name based on directory path."""
     # Use hash of path for unique container name
     path_hash = hashlib.sha256(dir_path.encode()).hexdigest()[:12]
-    return f"box-{path_hash}"
+    return f"ushabti-{path_hash}"
 
 
 def get_container_status(container_name):
@@ -186,8 +186,8 @@ def run_command_in_container(container_name, command_args, workdir=None):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: box.py <command> [args...]", file=sys.stderr)
-        print(f"Example: box.py ls -la", file=sys.stderr)
+        print("Usage: ushabti.py <command> [args...]", file=sys.stderr)
+        print(f"Example: ushabti.py ls -la", file=sys.stderr)
         sys.exit(1)
 
     # Read configuration
