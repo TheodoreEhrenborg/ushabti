@@ -39,7 +39,7 @@ def read_config():
             print(f"Error: Each entry must have 'dir' field: {entry}", file=sys.stderr)
             sys.exit(1)
 
-        dir_path = Path(entry["dir"]).resolve()
+        dir_path = Path(entry["dir"]).expanduser().resolve()
         image = entry.get("image", "ubuntu:latest")
 
         if not dir_path.exists():
