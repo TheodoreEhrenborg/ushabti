@@ -2,6 +2,8 @@
 
 A simple sandbox so you can give Claude free range, but only over one folder
 
+You're probably better off using the built-in https://code.claude.com/docs/en/sandboxing
+
 ## Installation
 
 1. Install docker 
@@ -27,6 +29,8 @@ A simple sandbox so you can give Claude free range, but only over one folder
 ## Security
 
 Is this really secure if Claude were determined to cause damage? Probably not. e.g. Claude could put malicious code in your project and wait for you to run the code outside the sandbox
+
+Also if you have secrets in your project, Claude could upload them. `ushabti` doesn't restrict networking
 
 ## Etymology
 
